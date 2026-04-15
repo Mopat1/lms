@@ -1,0 +1,15 @@
+@media print {
+  .sidebar, .mobile-header, .sidebar-overlay,
+  button, .card-actions, #toast-container, .modal-overlay { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+  .page-header, .page-body { padding: 16px !important; }
+  body { background: white !important; font-size: 12px; }
+  .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; }
+  .stat-card { break-inside: avoid; }
+  .table-wrap { overflow: visible !important; }
+  table { font-size: 11px; }
+  .report-grid { grid-template-columns: 1fr 1fr !important; }
+  h1 { font-size: 20px !important; }
+  .welcome-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}

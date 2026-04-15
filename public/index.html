@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/print.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+
+<!-- ── AUTH PAGES ──────────────────────────────────────────────────────── -->
+<div id="auth-section" class="auth-section hidden">
+  <!-- Login -->
+  <div id="login-page" class="auth-page">
+    <div class="auth-left">
+      <div class="auth-brand">
+        <div class="auth-logo">📚</div>
+        <h1 class="auth-title">Library<br>Management<br>System</h1>
+        <p class="auth-tagline">Your gateway to knowledge</p>
+      </div>
+      <div class="auth-decoration">
+        <div class="deco-circle c1"></div>
+        <div class="deco-circle c2"></div>
+        <div class="deco-circle c3"></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2>Welcome back</h2>
+        <p class="auth-sub">Sign in to your library account</p>
+        <div id="login-error" class="form-error hidden"></div>
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+            <span class="field-error" id="login-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-icon-wrap">
+              <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="toggle-pw" onclick="togglePw('login-password',this)">👁</button>
+            </div>
+            <span class="field-error" id="login-pw-err"></span>
+          </div>
+          <button type="submit" class="btn-primary full" id="login-btn">
+            <span class="btn-text">Sign In</span>
+            <span class="btn-loader hidden">⏳</span>
+          </button>
+        </form>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="showPage('signup-page')">Create one</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signup -->
+  <div id="signup-page" class="auth-page hidden">
+    <div class="auth-left">
+      <div class="auth-brand">
+        <div class="auth-logo">📚</div>
+        <h1 class="auth-title">Join Our<br>Library</h1>
+        <p class="auth-tagline">Thousands of books await you</p>
+      </div>
+      <div class="auth-decoration">
+        <div class="deco-circle c1"></div>
+        <div class="deco-circle c2"></div>
+        <div class="deco-circle c3"></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card" style="max-height:90vh;overflow-y:auto">
+        <h2>Create Account</h2>
+        <p class="auth-sub">Join as a member or administrator</p>
+
+        <div class="role-toggle">
+          <button class="role-btn active" id="role-member" onclick="selectRole('member')">👤 Member</button>
+          <button class="role-btn" id="role-admin" onclick="selectRole('admin')">🔑 Admin</button>
+        </div>
+
+        <div id="signup-error" class="form-error hidden"></div>
+        <div id="signup-success" class="form-success hidden"></div>
+
+        <form id="signup-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" id="su-name" placeholder="John Doe" required>
+              <span class="field-error" id="su-name-err"></span>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="su-phone" placeholder="+91 9876543210">
+              <span class="field-error" id="su-phone-err"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="su-email" placeholder="you@example.com" required>
+            <span class="field-error" id="su-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="su-address" placeholder="123 Main Street, City">
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <div class="input-icon-wrap">
+              <input type="password" id="su-password" placeholder="Min 8 characters" required>
+              <button type="button" class="toggle-pw" onclick="togglePw('su-password',this)">👁</button>
+            </div>
+            <div class="pw-strength" id="pw-strength"></div>
+            <span class="field-error" id="su-pw-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <div class="input-icon-wrap">
+              <input type="password" id="su-confirm-pw" placeholder="Repeat password" required>
+              <button type="button" class="toggle-pw" onclick="togglePw('su-confirm-pw',this)">👁</button>
+            </div>
+            <span class="field-error" id="su-cpw-err"></span>
+          </div>
+          <div class="form-group hidden" id="admin-key-group">
+            <label>Admin Registration Key *</label>
+            <input type="password" id="su-admin-key" placeholder="Enter admin key">
+            <span class="field-error" id="su-key-err"></span>
+            <small style="color:#888;font-size:11px">Default key: LIBRARY_ADMIN_2024</small>
+          </div>
+          <button type="submit" class="btn-primary full" id="signup-btn">
+            <span class="btn-text">Create Account</span>
+            <span class="btn-loader hidden">⏳</span>
+          </button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showPage('login-page')">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ────────────────────────────────────────────────────────── -->
+<div id="app-section" class="hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="sidebar-logo">📚</span>
+      <div>
+        <div class="sidebar-title" id="library-name-sidebar">Library</div>
+        <div class="sidebar-subtitle">Management System</div>
+      </div>
+    </div>
+
+    <div class="sidebar-user" id="sidebar-user">
+      <div class="user-avatar" id="user-avatar-sidebar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name-sidebar">Loading...</div>
+        <div class="user-role" id="user-role-sidebar">member</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- Filled by JS -->
+    </nav>
+
+    <button class="sidebar-logout" onclick="logout()">🚪 Sign Out</button>
+  </aside>
+
+  <!-- Mobile header -->
+  <div class="mobile-header">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <span class="mobile-title">📚 LMS</span>
+    <button class="sidebar-logout-mobile" onclick="logout()">🚪</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Main content -->
+  <main class="main-content" id="main-content">
+    <!-- Pages injected here by JS -->
+  </main>
+
+</div>
+
+<!-- ── TOAST NOTIFICATION ─────────────────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── MODAL ──────────────────────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<!-- App JS -->
+<script src="/js/app.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/books.js"></script>
+<script src="/js/transactions.js"></script>
+<script src="/js/members.js"></script>
+<script src="/js/reports.js"></script>
+
+</body>
+</html>
