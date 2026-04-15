@@ -1,109 +1,66 @@
-const express = require('express');
-const router = express.Router();
-const { requireAuth } = require('../middleware/auth');
 const { getAuth } = require('../config/firebase');
 
-
-// ===============================
-// 🔐 SIGNUP
-// ===============================
-router.post('/signup', async (req, res) => {
+// Verify Firebase ID token
+async function requireAuth(req, res, next) {
   try {
-    const { email, password, name } = req.body;
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.split('Bearer ')[1]
+      : req.session?.token;
 
-    const userRecord = await getAuth().createUser({
-      email,
-      password,
-      displayName: name
-    });
-
-    res.json({
-      success: true,
-      user: {
-        uid: userRecord.uid,
-        email: userRecord.email,
-        name: userRecord.displayName
-      }
-    });
-
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-
-// ===============================
-// 🔐 LOGIN (TOKEN VERIFY)
-// ===============================
-router.post('/login', async (req, res) => {
-  try {
-    const { token } = req.body;
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
 
     const decoded = await getAuth().verifyIdToken(token);
 
-    // store session
-    req.session.token = token;
+    // attach user
+    req.user = decoded;
 
-    res.json({
-      success: true,
-      user: decoded
-    });
-
+    next();
   } catch (err) {
-    res.status(401).json({
+    console.error('Auth error:', err.message);
+    return res.status(401).json({
       success: false,
-      error: 'Invalid login'
+      error: 'Invalid or expired token'
     });
   }
-});
+}
 
-
-// ===============================
-// 👤 GET PROFILE (FIX)
-// ===============================
-router.get('/profile', requireAuth, async (req, res) => {
+// Admin middleware
+async function requireAdmin(req, res, next) {
   try {
-    res.json({
-      success: true,
-      user: req.user
-    });
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.split('Bearer ')[1]
+      : req.session?.token;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    const decoded = await getAuth().verifyIdToken(token);
+
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    req.user = decoded;
+    next();
   } catch (err) {
-    res.status(500).json({
+    console.error('Admin auth error:', err.message);
+    return res.status(401).json({
       success: false,
-      error: err.message
+      error: 'Invalid or expired token'
     });
   }
-});
+}
 
-
-// ===============================
-// ✏️ UPDATE PROFILE (ALREADY USED BY YOUR FRONTEND)
-// ===============================
-router.put('/profile', requireAuth, async (req, res) => {
-  try {
-    const { name, phone, address } = req.body;
-
-    // update Firebase user
-    await getAuth().updateUser(req.user.uid, {
-      displayName: name
-    });
-
-    res.json({
-      success: true,
-      message: 'Profile updated'
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-
-// ===============================
-module.exports = router;
+module.exports = { requireAuth, requireAdmin };
